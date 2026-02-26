@@ -76,6 +76,20 @@ Business use:
 | 7 | PK/FK validation, null/duplicate checks | `Python (pandas)` or `SSMS SQL` |
 | 8-9 | Documentation, ER diagram, submission pack | `README.md`, `draw.io`/`dbdiagram.io`, `Word/PDF` |
 
+## Tool Mapping for DW/BI Requirement
+
+To demonstrate the requirement "ETL processes, data warehouse design, SSAS cubes, and reporting", use:
+
+| Requirement Area | Recommended Tools |
+|---|---|
+| ETL processes | `SSIS` (primary), or `Python (pandas)` / `SQL stored procedures` |
+| Data warehouse design | `SQL Server` + `SSMS` (staging, PK/FK, DW schema), `draw.io` / `dbdiagram.io` (ER design) |
+| SSAS cubes | `SQL Server Analysis Services (SSAS)` |
+| Reporting | `Power BI` (recommended) or `SSRS` / `Excel Pivot` |
+
+Suggested end-to-end stack:
+- `Python/pandas` -> `SQL Server/SSMS` -> `SSIS` -> `SSAS` -> `Power BI`
+
 Minimum toolchain:
 - `Python 3.x`
 - `pandas`
