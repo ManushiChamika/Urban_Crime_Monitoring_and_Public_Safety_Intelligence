@@ -54,7 +54,7 @@ Business use:
 - `offense_source (IUCR)` 1-to-many `crimes_original_reduced (IUCR)`
 - `location_source (Latitude, Longitude)` 1-to-many `crimes_original_reduced (Latitude, Longitude)` for non-null coordinates
 
-## Step-by-Step Process to Complete Assignment 1
+## Step-by-Step Process
 
 1. Identify scenario and business questions.
 2. Validate source as OLTP and confirm date coverage >= 1 year.
