@@ -1,0 +1,19 @@
+Prepared source validation
+Raw rows processed: 759161
+Incident rows written: 759161
+Offense rows written: 359
+Coordinate rows written: 248591
+Duplicate incident IDs found: 0
+Inconsistent IUCR definitions found: 0
+Inconsistent coordinate definitions found: 0
+Missing IUCR foreign keys: 0
+Missing non-null coordinate foreign keys: 0
+Incident rows with blank Latitude/Longitude: 4261
+Surrogate keys added during source preparation: 0
+Primary key checks:
+- crimes_original_reduced.csv: ID is unique
+- offense_source.txt: IUCR is unique
+- coordinate_source.csv: (Latitude, Longitude) is unique for non-null pairs
+Foreign key checks:
+- crimes_original_reduced.csv.IUCR -> offense_source.txt.IUCR valid for all rows
+- crimes_original_reduced.csv.(Latitude, Longitude) -> coordinate_source.csv.(Latitude, Longitude) valid for all non-null pairs
