@@ -1,4 +1,4 @@
-# Data Warehousing and Business Intelligence Assignment
+# Data Warehousing and Business Intelligence
 
 ## Selected Scenario
 
@@ -34,7 +34,7 @@ This gives:
 - `3` raw data sources
 - `2` source types: `CSV` and `Text`
 
-## Raw Columns Were Split were split as follows:
+## Raw Columns Were Split as follows:
 
 ### Kept in `crimes_original_reduced.csv`
 
