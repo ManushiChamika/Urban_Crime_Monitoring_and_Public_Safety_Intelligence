@@ -1,109 +1,165 @@
-# Data Warehousing & Business Intelligence
-
-## Dataset Selection (OLTP)
-
-This repository documents a complete, assignment-ready OLTP dataset selection and preparation for DW/BI work.
+# Data Warehousing and Business Intelligence Assignment
 
 ## Selected Scenario
 
-### Urban Crime Monitoring and Public Safety Intelligence (Chicago)
+### Urban Public Safety Incident Response and Community Risk Intelligence
 
-Business use:
-- Crime trend analysis by date and area
-- Offense-type and FBI-code analysis
-- Location and hotspot analysis
-- Arrest and domestic incident monitoring
+This project uses a police incident dataset for a public-safety DW/BI scenario. The source is OLTP-style because each row is a single recorded incident, not a pre-built fact table or OLAP cube.
 
-## Dataset Chosen
+## Original Dataset in the Repo
 
-- Base source (unchanged): `data/crimes_original_full.csv`
-- Domain: Transactional crime incidents
-- Incident time range (`Date`): **2023-01-01 00:00:00** to **2023-12-31 23:59:00** (full 1 year)
+- Raw file: `data/Crimes_-_2001_to_Present_20260321.csv`
+- Source: City of Chicago Data Portal, `Crimes - 2001 to Present`
+- Grain: one row per incident
+- Local row count: `759,161`
+- Column count: `22`
+- Local `Date` range: `2023-01-01 00:00:00` to `2026-01-01 00:00:00`
 
-## Final 3 Linked Raw Datasets
+Important note:
+The public dataset title says `2001 to Present`, but the local snapshot currently stored in this repository contains records from January 1, 2023 through January 1, 2026.
 
-| Dataset | Rows | Columns | PK | FK |
-|---|---:|---:|---|---|
-| `data/crimes_original_reduced.csv` | 263,271 | 16 | `ID` | `IUCR` -> `offense_source.IUCR`; (`Latitude`,`Longitude`) -> (`location_source.Latitude`,`location_source.Longitude`) |
-| `data/offense_source.csv` | 322 | 4 | `IUCR` | Referenced by `crimes_original_reduced.IUCR` |
-| `data/location_source.csv` | 128,677 | 5 | (`Latitude`,`Longitude`) | Referenced by `crimes_original_reduced` coordinate pair |
+## Prepared Data Sources
 
-## Columns (All)
+The raw dataset has been separated into three meaningful raw sources using only original columns from the source data. No surrogate keys were introduced at this stage.
 
-### `data/crimes_original_reduced.csv` (16)
-- `ID`, `Case Number`, `Date`, `IUCR`, `Latitude`, `Longitude`, `Block`, `Location Description`, `Arrest`, `Domestic`, `Beat`, `District`, `Ward`, `Community Area`, `Year`, `Updated On`
+| Source | Type | Rows | Primary key | Foreign keys / relationship |
+|---|---|---:|---|---|
+| `data/crimes_original_reduced.csv` | CSV | `759,161` | `ID` | `IUCR -> offense_source.txt.IUCR`; `(Latitude, Longitude) -> coordinate_source.csv.(Latitude, Longitude)` for non-null pairs |
+| `data/offense_source.txt` | Text (tab-delimited) | `359` | `IUCR` | Referenced by `crimes_original_reduced.csv` |
+| `data/coordinate_source.csv` | CSV | `248,591` | `(Latitude, Longitude)` | Referenced by `crimes_original_reduced.csv` for non-null pairs |
 
-### `data/offense_source.csv` (4)
-- `IUCR`, `Primary Type`, `Description`, `FBI Code`
+This gives:
 
-### `data/location_source.csv` (5)
-- `Location`, `Latitude`, `Longitude`, `X Coordinate`, `Y Coordinate`
+- `3` raw data sources
+- at least `2` source types: `CSV` and `Text`
 
-## Assignment Requirement Checklist
+## How the Raw Columns Were Split
 
-| Requirement | Status | Evidence in this repo |
+### Kept in `crimes_original_reduced.csv`
+
+- `ID`
+- `Case Number`
+- `Date`
+- `Block`
+- `Location Description`
+- `Arrest`
+- `Domestic`
+- `Beat`
+- `District`
+- `Ward`
+- `Community Area`
+- `Year`
+- `Updated On`
+- `Latitude`
+- `Longitude`
+- `IUCR`
+
+### Moved to `offense_source.txt`
+
+- `IUCR`
+- `Primary Type`
+- `Description`
+- `FBI Code`
+
+### Moved to `coordinate_source.csv`
+
+- `Latitude`
+- `Longitude`
+- `X Coordinate`
+- `Y Coordinate`
+- `Location`
+
+Why `Latitude` and `Longitude` remain in the incident source:
+
+- they are the natural composite foreign key to `coordinate_source.csv`
+- they already exist in the original dataset
+- no generated key was needed
+
+## Key Validation
+
+The split was validated after generation.
+
+- `ID` is unique in `crimes_original_reduced.csv`
+- `IUCR` is unique in `offense_source.txt`
+- `(Latitude, Longitude)` is unique in `coordinate_source.csv` for non-null pairs
+- Missing `IUCR` foreign keys: `0`
+- Missing non-null coordinate foreign keys: `0`
+- Duplicate incident IDs found: `0`
+- Inconsistent `IUCR` definitions found: `0`
+- Inconsistent coordinate definitions found: `0`
+- Surrogate keys added during source preparation: `0`
+
+Validation report:
+
+- `data/source_validation.txt`
+
+## Logical Source Model
+
+```mermaid
+erDiagram
+    CRIME_INCIDENT {
+        bigint ID PK
+        string CASE_NUMBER
+        datetime DATE
+        string BLOCK
+        string LOCATION_DESCRIPTION
+        boolean ARREST
+        boolean DOMESTIC
+        string BEAT
+        string DISTRICT
+        string WARD
+        string COMMUNITY_AREA
+        int YEAR
+        datetime UPDATED_ON
+        string LATITUDE FK
+        string LONGITUDE FK
+        string IUCR FK
+    }
+
+    OFFENSE_SOURCE {
+        string IUCR PK
+        string PRIMARY_TYPE
+        string DESCRIPTION
+        string FBI_CODE
+    }
+
+    COORDINATE_SOURCE {
+        string LATITUDE PK
+        string LONGITUDE PK
+        string X_COORDINATE
+        string Y_COORDINATE
+        string LOCATION
+    }
+
+    OFFENSE_SOURCE ||--o{ CRIME_INCIDENT : classifies
+    COORDINATE_SOURCE ||--o{ CRIME_INCIDENT : locates
+```
+
+## Assignment Fit
+
+| Requirement | Status | Notes |
 |---|---|---|
-| OLTP dataset only (not OLAP) | Satisfied | `data/crimes_original_full.csv` is row-level transactional source data with no pre-built fact/dimension schema |
-| Uniqueness (not lab dataset / not AdventureWorks) | Satisfied | Scenario and source are crime-incident data, not AdventureWorks |
-| At least ~1 year of data | Satisfied | Incident `Date` covers full year 2023 |
-| Rich attributes and relationships | Satisfied | 3 linked datasets with event, offense reference, and location reference entities |
-| Suitable for ETL, DW design, SSAS, reporting | Satisfied | PK/FK model and source separation support ETL pipelines and downstream DW/BI modeling |
+| OLTP dataset only | Satisfied | Incident-level operational records |
+| Not AdventureWorks | Satisfied | Public-safety dataset |
+| Around one year or more | Satisfied | More than three years in the local snapshot |
+| Enough records and attributes | Satisfied | 759,161 rows, 22 original columns |
+| Three raw data sources | Satisfied | Incident, offense, and coordinate sources created |
+| At least two source types | Satisfied | CSV and text sources created |
+| Meaningful PK/FK relationships | Satisfied | `ID`, `IUCR`, and `(Latitude, Longitude)` validated without surrogate keys |
+| Suitable for DW design, SSAS, reporting | Satisfied | Clear fact and dimension candidates |
 
-## Relationship Model (ER-Style)
+## Suggested DW Use
 
-- `offense_source (IUCR)` 1-to-many `crimes_original_reduced (IUCR)`
-- `location_source (Latitude, Longitude)` 1-to-many `crimes_original_reduced (Latitude, Longitude)` for non-null coordinates
+Candidate warehouse structures:
 
-## Step-by-Step Process
+- `FactIncident`
+- `DimDate`
+- `DimOffense`
+- `DimLocation`
+- `DimPoliceArea`
 
-1. Identify scenario and business questions.
-2. Validate source as OLTP and confirm date coverage >= 1 year.
-3. Identify entities and keys from source columns.
-4. Build reduced main transaction dataset (`crimes_original_reduced.csv`).
-5. Build offense reference dataset (`offense_source.csv`).
-6. Build location reference dataset (`location_source.csv`).
-7. Validate PK/FK integrity and uniqueness.
-8. Document data quality issues and handling rules.
-9. Prepare final submission artifacts (dataset summary, ER diagram, justification, extension note).
+Useful hierarchies:
 
-## Tools in Order (Mapped to Steps)
-
-| Steps | Task | Recommended tools |
-|---|---|---|
-| 1-2 | Source review, counts, date-range checks | `VS Code`/`Excel`, `Python (pandas)` |
-| 3 | Key discovery and relationship checks | `Python (pandas)` |
-| 4-6 | Dataset splitting, cleanup, CSV export | `Python (pandas)` or `SQL Server (SSMS)` |
-| 7 | PK/FK validation, null/duplicate checks | `Python (pandas)` or `SSMS SQL` |
-| 8-9 | Documentation, ER diagram, submission pack | `README.md`, `draw.io`/`dbdiagram.io`, `Word/PDF` |
-
-## Tool Mapping for DW/BI Requirement
-
-To demonstrate the requirement "ETL processes, data warehouse design, SSAS cubes, and reporting", use:
-
-| Requirement Area | Recommended Tools |
-|---|---|
-| ETL processes | `SSIS` (primary), or `Python (pandas)` / `SQL stored procedures` |
-| Data warehouse design | `SQL Server` + `SSMS` (staging, PK/FK, DW schema), `draw.io` / `dbdiagram.io` (ER design) |
-| SSAS cubes | `SQL Server Analysis Services (SSAS)` |
-| Reporting | `Power BI` (recommended) or `SSRS` / `Excel Pivot` |
-
-Suggested end-to-end stack:
-- `Python/pandas` -> `SQL Server/SSMS` -> `SSIS` -> `SSAS` -> `Power BI`
-
-Minimum toolchain:
-- `Python 3.x`
-- `pandas`
-- `VS Code`
-- `draw.io` (or equivalent ER tool)
-
-## Data Quality Note
-
-- Rows with null latitude/longitude: `2,028` (`~0.77%` of crime rows)
-- Impact: small; non-location analyses are unaffected
-- ETL handling: map these rows to `Unknown Location` when full location joins are required
-
-## Files
-
-- Root-level assignment overview: `README.md`
-- Detailed data dictionary and linkage notes: `data/README.md`
-- Original unchanged source kept for traceability: `data/crimes_original_full.csv`
+- `Year -> Quarter -> Month -> Day`
+- `District -> Beat`
+- `Primary Type -> Description -> IUCR`
