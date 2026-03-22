@@ -6,7 +6,7 @@
 
 This is a police incident dataset for a public-safety DW/BI scenario. The source is OLTP-style as each row is a single recorded incident, not a pre-built fact table or OLAP cube.
 
-## Original Dataset in the Repo
+## Original Dataset
 
 - Raw file: `data/Crimes_-_2001_to_Present_20260321.csv`
 - Source: City of Chicago Data Portal, `Crimes - 2001 to Present`
@@ -15,12 +15,13 @@ This is a police incident dataset for a public-safety DW/BI scenario. The source
 - Column count: `22`
 - Local `Date` range: `2023-01-01 00:00:00` to `2026-01-01 00:00:00`
 
-Important note:
+### Important note:
+
 Although the original public dataset spans 2001 to the present, the local currently stored includes only records from January 1, 2023, to January 1, 2026. Since loading the full dataset of approximately 7 million records into the data warehouse is not feasible, the data is reduced for the ELT process to include only records from 2023–2026.
 
 ## Prepared Data Sources
 
-The raw dataset has been separated into three meaningful raw sources using only original columns from the source data.
+The raw dataset is separated into three meaningful raw sources using only original columns from the source data.
 
 | Source | Type | Rows | Primary key | Foreign keys / relationship |
 |---|---|---:|---|---|
@@ -145,10 +146,10 @@ erDiagram
 | Enough records and attributes | Satisfied | 759,161 rows, 22 original columns |
 | Three raw data sources | Satisfied | Incident, offense, and coordinate sources created |
 | At least two source types | Satisfied | CSV and text sources |
-| Meaningful PK/FK relationships | Satisfied | `ID`, `IUCR`, and `(Latitude, Longitude)` validated without surrogate keys |
+| Meaningful PK/FK relationships | Satisfied | `ID`, `IUCR`, and `(Latitude, Longitude)` |
 | Suitable for DW design, SSAS, reporting | Satisfied | Clear fact and dimension candidates |
 
-## (Data warehouse)DW Use
+## Data warehouse(DW) Use:
 
 Candidate warehouse structures:
 
