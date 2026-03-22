@@ -1,4 +1,4 @@
-# Data Warehousing and Business Intelligence Assignment
+# Data Warehousing and Business Intelligence
 
 ## Selected Scenario
 
