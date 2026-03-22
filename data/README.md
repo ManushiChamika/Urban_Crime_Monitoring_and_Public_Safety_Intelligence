@@ -20,14 +20,12 @@ The prepared sources now use:
 
 ## Natural-Key-Only Preparation
 
-No surrogate keys were added in the prepared-source stage.
-
 - incident primary key uses original column `ID`
 - offense primary key uses original column `IUCR`
 - coordinate primary key uses original composite `(Latitude, Longitude)`
 - the incident source keeps `IUCR`, `Latitude`, and `Longitude` as natural foreign keys
 
-This keeps the preparation layer close to the original OLTP data. Surrogate keys can be introduced later in the warehouse design.
+Keeps the preparation layer close to the original OLTP data.
 
 ## 1) crimes_original_reduced.csv
 
@@ -69,7 +67,7 @@ Columns:
 - `Longitude`
 - `IUCR`
 
-Columns removed from the raw file because they were moved to other sources:
+Columns removed from the raw file to be moved to other sources:
 
 - `Primary Type`
 - `Description`
@@ -141,7 +139,7 @@ Key quality:
 
 ## Validation Results
 
-The preparation was checked after file generation.
+The preparation checked after file generation.
 
 - Raw rows processed: `759,161`
 - Incident rows written: `759,161`

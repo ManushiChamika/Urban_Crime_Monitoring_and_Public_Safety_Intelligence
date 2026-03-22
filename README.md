@@ -4,9 +4,9 @@
 
 ### Urban Public Safety Incident Response and Community Risk Intelligence
 
-This project uses a police incident dataset for a public-safety DW/BI scenario. The source is OLTP-style because each row is a single recorded incident, not a pre-built fact table or OLAP cube.
+This is a police incident dataset for a public-safety DW/BI scenario. The source is OLTP-style as each row is a single recorded incident, not a pre-built fact table or OLAP cube.
 
-## Original Dataset in the Repo
+## Original Dataset
 
 - Raw file: `data/Crimes_-_2001_to_Present_20260321.csv`
 - Source: City of Chicago Data Portal, `Crimes - 2001 to Present`
@@ -15,12 +15,13 @@ This project uses a police incident dataset for a public-safety DW/BI scenario. 
 - Column count: `22`
 - Local `Date` range: `2023-01-01 00:00:00` to `2026-01-01 00:00:00`
 
-Important note:
-The public dataset title says `2001 to Present`, but the local snapshot currently stored in this repository contains records from January 1, 2023 through January 1, 2026.
+### Important note:
+
+Although the original public dataset spans 2001 to the present, the local currently stored includes only records from January 1, 2023, to January 1, 2026. Since loading the full dataset of approximately 7 million records into the data warehouse is not feasible, the data is reduced for the ELT process to include only records from 2023–2026.
 
 ## Prepared Data Sources
 
-The raw dataset has been separated into three meaningful raw sources using only original columns from the source data. No surrogate keys were introduced at this stage.
+The raw dataset is separated into three meaningful raw sources using only original columns from the source data.
 
 | Source | Type | Rows | Primary key | Foreign keys / relationship |
 |---|---|---:|---|---|
@@ -31,9 +32,9 @@ The raw dataset has been separated into three meaningful raw sources using only 
 This gives:
 
 - `3` raw data sources
-- at least `2` source types: `CSV` and `Text`
+- `2` source types: `CSV` and `Text`
 
-## How the Raw Columns Were Split
+## Raw Columns Were Split were split as follows:
 
 ### Kept in `crimes_original_reduced.csv`
 
@@ -69,7 +70,7 @@ This gives:
 - `Y Coordinate`
 - `Location`
 
-Why `Latitude` and `Longitude` remain in the incident source:
+`Latitude` and `Longitude` remain in the incident source as:
 
 - they are the natural composite foreign key to `coordinate_source.csv`
 - they already exist in the original dataset
@@ -135,7 +136,7 @@ erDiagram
     COORDINATE_SOURCE ||--o{ CRIME_INCIDENT : locates
 ```
 
-## Assignment Fit
+## Assignment 
 
 | Requirement | Status | Notes |
 |---|---|---|
@@ -144,11 +145,11 @@ erDiagram
 | Around one year or more | Satisfied | More than three years in the local snapshot |
 | Enough records and attributes | Satisfied | 759,161 rows, 22 original columns |
 | Three raw data sources | Satisfied | Incident, offense, and coordinate sources created |
-| At least two source types | Satisfied | CSV and text sources created |
-| Meaningful PK/FK relationships | Satisfied | `ID`, `IUCR`, and `(Latitude, Longitude)` validated without surrogate keys |
+| At least two source types | Satisfied | CSV and text sources |
+| Meaningful PK/FK relationships | Satisfied | `ID`, `IUCR`, and `(Latitude, Longitude)` |
 | Suitable for DW design, SSAS, reporting | Satisfied | Clear fact and dimension candidates |
 
-## Suggested DW Use
+## Data warehouse(DW) Use:
 
 Candidate warehouse structures:
 
@@ -158,7 +159,7 @@ Candidate warehouse structures:
 - `DimLocation`
 - `DimPoliceArea`
 
-Useful hierarchies:
+hierarchies:
 
 - `Year -> Quarter -> Month -> Day`
 - `District -> Beat`
