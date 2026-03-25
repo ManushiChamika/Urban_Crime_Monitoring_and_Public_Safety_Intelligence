@@ -1,31 +1,31 @@
 # Data Source Preparation
 
-## Files in This Folder
+## Files In This Folder
 
 | File | Type | Role |
 |---|---|---|
 | `Crimes_-_2001_to_Present_20260321.csv` | CSV | Original raw dataset kept unchanged |
-| `crimes_original_reduced.csv` | CSV | Main incident source after removing offense and coordinate detail columns |
-| `offense_source.txt` | Text (tab-delimited) | Offense lookup source |
-| `coordinate_source.csv` | CSV | Coordinate lookup source keyed by `Latitude` and `Longitude` |
+| `crimes_original_reduced.csv` | CSV | Main prepared incident source after removing offense and coordinate detail columns |
+| `offense_source.txt` | Text (tab-delimited) | Prepared offense lookup source |
+| `coordinate_source.xlsx` | XLSX | Prepared coordinate lookup source keyed by `Latitude` and `Longitude` |
 | `source_validation.txt` | Text | PK/FK and row-count validation report |
 | `dataset_link.txt` | Text | Original public dataset link |
 
 ## Source Types Achieved
 
-The prepared sources now use:
+The prepared sources used for ETL now use:
 
-- `3` raw data sources
-- `2` source types: `CSV` and `Text`
+- `3` prepared source files
+- `3` source types: `CSV`, `Text`, and `XLSX`
 
 ## Natural-Key-Only Preparation
 
 - incident primary key uses original column `ID`
 - offense primary key uses original column `IUCR`
 - coordinate primary key uses original composite `(Latitude, Longitude)`
-- the incident source keeps `IUCR`, `Latitude`, and `Longitude` as natural foreign keys
+- the incident source keeps `Case Number`, `IUCR`, `District`, `Beat`, `Ward`, `Community Area`, `Latitude`, and `Longitude` as natural relationship attributes in the ER model
 
-Keeps the preparation layer close to the original OLTP data.
+This keeps the preparation layer close to the original OLTP data.
 
 ## 1) crimes_original_reduced.csv
 
@@ -33,16 +33,21 @@ Meaning:
 
 - one row per crime incident
 - this is the main transactional source
-- it keeps the event-level attributes and the natural foreign keys
+- it keeps the event-level attributes and the natural reference values used in the ER model
 
 Primary key:
 
 - `ID`
 
-Foreign keys:
+Relationship attributes carried by the incident source:
 
-- `IUCR -> offense_source.txt.IUCR`
-- `(Latitude, Longitude) -> coordinate_source.csv.(Latitude, Longitude)` for non-null pairs
+- `Case Number`
+- `IUCR`
+- `District`
+- `Beat`
+- `Ward`
+- `Community Area`
+- `(Latitude, Longitude)` for non-null coordinate pairs
 
 Rows:
 
@@ -104,13 +109,14 @@ Key quality:
 - `IUCR` is unique
 - each `IUCR` maps to exactly one offense definition in the source snapshot
 
-## 3) coordinate_source.csv
+## 3) coordinate_source.xlsx
 
 Meaning:
 
 - coordinate lookup derived from the raw dataset
 - one record per distinct non-null `Latitude` and `Longitude` pair
-- it isolates reusable spatial attributes without adding a surrogate key
+- stored as an Excel workbook in the current workspace
+- isolates reusable spatial attributes without adding a surrogate key
 
 Primary key:
 
@@ -135,11 +141,12 @@ Key quality:
 ## Relationship Summary
 
 - `offense_source.txt (IUCR)` has a one-to-many relationship with `crimes_original_reduced.csv (IUCR)`
-- `coordinate_source.csv (Latitude, Longitude)` has a one-to-many relationship with `crimes_original_reduced.csv (Latitude, Longitude)` for non-null coordinate pairs
+- `coordinate_source.xlsx (Latitude, Longitude)` has a one-to-many relationship with `crimes_original_reduced.csv (Latitude, Longitude)` for non-null pairs
+- `Case Number`, `District`, `Beat`, `Ward`, and `Community Area` are also relationship-driving values carried by `crimes_original_reduced.csv` and represented as entities in the corrected ER model
 
 ## Validation Results
 
-The preparation checked after file generation.
+The preparation was checked after file generation.
 
 - Raw rows processed: `759,161`
 - Incident rows written: `759,161`
@@ -161,7 +168,7 @@ See:
 
 - `crimes_original_reduced.csv` stays at the original transaction grain
 - `offense_source.txt` isolates a reusable offense classification entity
-- `coordinate_source.csv` isolates reusable spatial coordinate attributes
-- the split creates three raw data sources without inventing new business attributes or surrogate identifiers
+- `coordinate_source.xlsx` isolates reusable spatial coordinate attributes in a different source type
+- the preparation uses three source files across three source types without inventing surrogate identifiers in the source layer
 
-This makes the prepared sources appropriate for ETL, later dimensional modeling, SSAS, and reporting.
+This makes the prepared sources appropriate for ETL, dimensional modeling, SSAS, and reporting.

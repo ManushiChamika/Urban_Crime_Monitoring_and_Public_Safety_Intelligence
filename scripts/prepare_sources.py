@@ -1,6 +1,8 @@
 import csv
 from pathlib import Path
 
+from openpyxl import Workbook
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = ROOT / "data"
@@ -8,6 +10,7 @@ RAW_FILE = DATA_DIR / "Crimes_-_2001_to_Present_20260321.csv"
 
 INCIDENT_FILE = DATA_DIR / "crimes_original_reduced.csv"
 COORDINATE_FILE = DATA_DIR / "coordinate_source.csv"
+COORDINATE_XLSX_FILE = DATA_DIR / "coordinate_source.xlsx"
 OFFENSE_FILE = DATA_DIR / "offense_source.txt"
 VALIDATION_FILE = DATA_DIR / "source_validation.txt"
 
@@ -45,6 +48,18 @@ OFFENSE_FIELDS = [
     "FBI Code",
 ]
 
+
+def write_coordinate_workbook(csv_path: Path, xlsx_path: Path) -> None:
+    workbook = Workbook(write_only=True)
+    sheet = workbook.create_sheet(title="coordinate_source")
+
+    with csv_path.open("r", encoding="utf-8", newline="") as csv_handle:
+        reader = csv.reader(csv_handle)
+        for row in reader:
+            sheet.append(row)
+
+    workbook.save(xlsx_path)
+
 def prepare_sources():
     if not RAW_FILE.exists():
         raise FileNotFoundError(f"Raw file not found: {RAW_FILE}")
@@ -61,7 +76,7 @@ def prepare_sources():
     inconsistent_coordinates = 0
     blank_coordinate_rows = 0
 
-    for path in [INCIDENT_FILE, COORDINATE_FILE, OFFENSE_FILE, VALIDATION_FILE]:
+    for path in [INCIDENT_FILE, COORDINATE_FILE, COORDINATE_XLSX_FILE, OFFENSE_FILE, VALIDATION_FILE]:
         if path.exists():
             path.unlink()
 
@@ -132,6 +147,8 @@ def prepare_sources():
 
     with COORDINATE_FILE.open("r", encoding="utf-8", newline="") as coordinate_handle:
         coordinate_count = sum(1 for _ in coordinate_handle) - 1
+
+    write_coordinate_workbook(COORDINATE_FILE, COORDINATE_XLSX_FILE)
 
     offense_count = len(offense_lookup)
     missing_iucr_fk = 0
