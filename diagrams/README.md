@@ -1,6 +1,6 @@
 # Diagram Notes
 
-## Corrected ER Scope
+## ER Scope
 
 The ER model describes the prepared source snapshot used for ETL.
 
@@ -10,11 +10,9 @@ The prepared source files currently available in the workspace are:
 - `Data/offense_source.txt`
 - `Data/coordinate_source.xlsx`
 
-The ER diagram should be derived from the values that actually occur in those files, not from a cleaned ideal city-administration hierarchy.
+## 1. The Entities
 
-## 1. Identify The Entities
-
-These are the entities that should appear in the ER model for the prepared source snapshot:
+These are the entities that appear in the ER model for the prepared source snapshot:
 
 - `Crime Incident`
   One row per incident from `crimes_original_reduced.csv`
@@ -53,9 +51,9 @@ Reason:
 - `Coordinate Point` has its own composite identifier: `(Latitude, Longitude)`
 - `District`, `Beat`, `Ward`, and `Community Area` each use their own code value as identifier
 
-No weak entity is needed in the final ER model.
+No weak entity final ER model.
 
-## 3. Define The Attributes Of The Entities
+## 3. The Attributes Of The Entities
 
 ### Crime Incident
 
@@ -175,9 +173,9 @@ These are the relationships that should be shown in the ER model:
 | `Community Area - Crime Incident` | `1:N` | Partial on the `Crime Incident` side because `Community Area` is sometimes blank | `35` incident rows have blank `Community Area` |
 | `Ward - Community Area` | `N:N` | Optional secondary geography relationship, not a hierarchy | `49` wards map to multiple community areas, and `70` community areas map to multiple wards |
 
-## Important Modelling Correction
+## Important Modelling 
 
-Do not draw a direct `District 1:N Beat` hierarchy in the ER model for this prepared source snapshot.
+Do not draw a direct `District 1:N Beat` hierarchy in the ER model.
 
 Reason:
 

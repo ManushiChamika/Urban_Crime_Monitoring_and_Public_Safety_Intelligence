@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<DataProfile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://schemas.microsoft.com/sqlserver/2008/DataDebugger/">
+  <ProfileVersion>1.0</ProfileVersion>
+  <DataSources>
+    <DtsDataSource ID="{3BB655A7-07CE-4194-9C01-8A539BC854CD}" Name="CM_CoordinateXLSX">
+      <DtsConnectionManagerID>CM_CoordinateXLSX</DtsConnectionManagerID>
+    </DtsDataSource>
+    <DtsDataSource ID="{B3205794-0ACE-4D63-9FF9-DB7AFA74F74A}" Name="CM_DWBI_Staging">
+      <DtsConnectionManagerID>CM_DWBI_Staging</DtsConnectionManagerID>
+    </DtsDataSource>
+    <DtsDataSource ID="{668E8DAE-2114-44E9-8A8B-B29928F10CB1}" Name="CM_DWBI_Warehouse">
+      <DtsConnectionManagerID>CM_DWBI_Warehouse</DtsConnectionManagerID>
+    </DtsDataSource>
+    <DtsDataSource ID="{BFEA7609-85F7-4DC7-B988-FB4613C05D9C}" Name="CM_IncidentCSV">
+      <DtsConnectionManagerID>CM_IncidentCSV</DtsConnectionManagerID>
+    </DtsDataSource>
+    <DtsDataSource ID="{8EAAEC19-FFAA-4203-BF9C-3E1DB2B2366D}" Name="CM_OffenseTXT">
+      <DtsConnectionManagerID>CM_OffenseTXT</DtsConnectionManagerID>
+    </DtsDataSource>
+    <DtsDataSource ID="{C814CEC1-12F3-4C03-AC48-77C4904682E1}" Name="Coordinate_Profile.xml">
+      <DtsConnectionManagerID>Coordinate_Profile.xml</DtsConnectionManagerID>
+    </DtsDataSource>
+    <DtsDataSource ID="{EDA0852D-19D2-4EB7-BC48-FF73166AB10F}" Name="CrimeIncident_Profile.xml">
+      <DtsConnectionManagerID>CrimeIncident_Profile.xml</DtsConnectionManagerID>
+    </DtsDataSource>
+    <DtsDataSource ID="{E2EA191A-F887-4EBB-A799-7BDC597A7FD1}" Name="Excel Connection Manager">
+      <DtsConnectionManagerID>Excel Connection Manager</DtsConnectionManagerID>
+    </DtsDataSource>
+    <DtsDataSource ID="{7ED0C40F-913B-4A2B-8F1A-62137C294778}" Name="LENOVO\MSSQLSERVER2.Crime_SourceDB.sa">
+      <DtsConnectionManagerID>LENOVO\MSSQLSERVER2.Crime_SourceDB.sa</DtsConnectionManagerID>
+    </DtsDataSource>
+    <DtsDataSource ID="{CE2E571D-6493-4167-91F7-CABB06093480}" Name="Offense_Profile.xml">
+      <DtsConnectionManagerID>Offense_Profile.xml</DtsConnectionManagerID>
+    </DtsDataSource>
+  </DataSources>
+  <DataProfileInput>
+    <ProfileMode>Exact</ProfileMode>
+    <Timeout>0</Timeout>
+    <Requests>
+      <ColumnNullRatioProfileRequest ID="NullRatioReq">
+        <DataSourceID>{7ED0C40F-913B-4A2B-8F1A-62137C294778}</DataSourceID>
+        <Table Schema="dbo" Table="CrimeIncident_Source" />
+        <Column IsWildCard="false" ColumnName="IUCR" />
+      </ColumnNullRatioProfileRequest>
+      <ColumnNullRatioProfileRequest ID="NullRatioReq1">
+        <DataSourceID>{7ED0C40F-913B-4A2B-8F1A-62137C294778}</DataSourceID>
+        <Table Schema="dbo" Table="CrimeIncident_Source" />
+        <Column IsWildCard="false" ColumnName="District" />
+      </ColumnNullRatioProfileRequest>
+      <ColumnNullRatioProfileRequest ID="NullRatioReq2">
+        <DataSourceID>{7ED0C40F-913B-4A2B-8F1A-62137C294778}</DataSourceID>
+        <Table Schema="dbo" Table="CrimeIncident_Source" />
+        <Column IsWildCard="false" ColumnName="Beat" />
+      </ColumnNullRatioProfileRequest>
+      <ColumnValueDistributionProfileRequest ID="ValueDistReq">
+        <DataSourceID>{7ED0C40F-913B-4A2B-8F1A-62137C294778}</DataSourceID>
+        <Table Schema="dbo" Table="CrimeIncident_Source" />
+        <Column IsWildCard="false" ColumnName="District" />
+        <Option>FrequentValues</Option>
+        <FrequentValueThreshold>0.001</FrequentValueThreshold>
+      </ColumnValueDistributionProfileRequest>
+      <ColumnValueDistributionProfileRequest ID="ValueDistReq1">
+        <DataSourceID>{7ED0C40F-913B-4A2B-8F1A-62137C294778}</DataSourceID>
+        <Table Schema="dbo" Table="CrimeIncident_Source" />
+        <Column IsWildCard="false" ColumnName="Beat" />
+        <Option>FrequentValues</Option>
+        <FrequentValueThreshold>0.001</FrequentValueThreshold>
+      </ColumnValueDistributionProfileRequest>
+      <CandidateKeyProfileRequest ID="KeyReq">
+        <DataSourceID>{7ED0C40F-913B-4A2B-8F1A-62137C294778}</DataSourceID>
+        <Table Schema="dbo" Table="CrimeIncident_Source" />
+        <KeyColumns>
+          <Column IsWildCard="false" ColumnName="IncidentID" />
+        </KeyColumns>
+        <ThresholdSetting>Specified</ThresholdSetting>
+        <KeyStrengthThreshold>0.95</KeyStrengthThreshold>
+        <VerifyOutputInFastMode>false</VerifyOutputInFastMode>
+        <MaxNumberOfViolations>100</MaxNumberOfViolations>
+      </CandidateKeyProfileRequest>
+    </Requests>
+  </DataProfileInput>
+  <DataProfileOutput>
+    <Profiles />
+  </DataProfileOutput>
+</DataProfile>
